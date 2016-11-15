@@ -1,0 +1,8 @@
+package hamt
+
+modules = Data.HashSet
+        , Data.Array
+main = Main
+sourcedir = src
+executable = hamt
+pkgs = effects, contrib
