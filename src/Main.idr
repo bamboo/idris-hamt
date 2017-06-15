@@ -4,6 +4,7 @@ import Effects
 import Effect.Perf
 import Effect.Random
 
+import Data.Hash
 import Data.HashSet
 import Data.SortedSet as SortedSet
 
@@ -24,8 +25,8 @@ gosperGun =
    (35,3), (36,3), (35,4), (36,4)]
 
 interface Set (s: Type -> Type) where
-  fromList' : (Hash a, Ord a) => List a -> s a
-  member' : (Hash a, Ord a) => a -> s a -> Bool
+  fromList' : (Hashable a, Ord a) => List a -> s a
+  member' : (Hashable a, Ord a) => a -> s a -> Bool
 
 Set HashSet where
   fromList' = fromList
@@ -44,7 +45,7 @@ Gen Cell where
     y <- rndInt 1 100
     pure (fromInteger x, fromInteger y)
 
-time : (Ord a, Hash a, Gen a, Set s) => String -> List a -> Eff (s a, List (a, Bool), PMetrics) [PERF, RND]
+time : (Ord a, Hashable a, Gen a, Set s) => String -> List a -> Eff (s a, List (a, Bool), PMetrics) [PERF, RND]
 time label xs = do
   collectPMetricsOnly
   mkTimer label
@@ -54,7 +55,7 @@ time label xs = do
   stopTimer label
   pure (set, cases, !getPerfMetrics)
  where
-  loop : (Ord a, Hash a, Gen a, Set s) => s a -> Nat -> List (a, Bool) -> Eff (List (a, Bool)) [RND]
+  loop : (Ord a, Hashable a, Gen a, Set s) => s a -> Nat -> List (a, Bool) -> Eff (List (a, Bool)) [RND]
   loop _ Z acc = pure acc
   loop set (S k) acc = do
     e <- rand'
